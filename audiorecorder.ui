@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>297</width>
-    <height>413</height>
+    <width>340</width>
+    <height>509</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,10 +17,40 @@
    <layout class="QGridLayout" name="gridLayout_3">
     <item row="0" column="0" colspan="3">
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Input Device:</string>
+         <string>Audio Codec:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="audioCodecBox"/>
+      </item>
+      <item row="4" column="1">
+       <widget class="QComboBox" name="groupCB"/>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Sample rate:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="1">
+       <widget class="QLineEdit" name="nameLE"/>
+      </item>
+      <item row="8" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>Given Id:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>Study Group: </string>
         </property>
        </widget>
       </item>
@@ -31,61 +61,65 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QComboBox" name="audioCodecBox"/>
-      </item>
-      <item row="2" column="1">
-       <widget class="QComboBox" name="containerBox"/>
-      </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>Level:</string>
+      <item row="8" column="1">
+       <widget class="QSpinBox" name="idSPB">
+        <property name="maximum">
+         <number>1000</number>
         </property>
        </widget>
-      </item>
-      <item row="5" column="1">
-       <widget class="QSpinBox" name="idSPB"/>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Audio Codec:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QComboBox" name="sampleRateBox"/>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>Sample rate:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1">
-       <widget class="QSpinBox" name="levelSPB"/>
-      </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="label_6">
-        <property name="text">
-         <string>Given Id:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QComboBox" name="audioDeviceBox"/>
       </item>
       <item row="6" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Current Number: </string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="0">
        <widget class="QLabel" name="label_7">
         <property name="text">
          <string>Name:</string>
         </property>
        </widget>
       </item>
+      <item row="5" column="1">
+       <widget class="QComboBox" name="rangeCB"/>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Input Device:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="audioDeviceBox"/>
+      </item>
+      <item row="2" column="1">
+       <widget class="QComboBox" name="containerBox"/>
+      </item>
+      <item row="3" column="1">
+       <widget class="QComboBox" name="sampleRateBox"/>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>Range:</string>
+        </property>
+       </widget>
+      </item>
       <item row="6" column="1">
-       <widget class="QLineEdit" name="nameLE"/>
+       <widget class="QSpinBox" name="curNumSPB"/>
+      </item>
+      <item row="7" column="0">
+       <widget class="QLabel" name="label_10">
+        <property name="text">
+         <string>Current Count: </string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="1">
+       <widget class="QSpinBox" name="curCntSPB"/>
       </item>
      </layout>
     </item>

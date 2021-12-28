@@ -1,53 +1,3 @@
-/****************************************************************************
-**
-** Copyright (C) 2017 The Qt Company Ltd.
-** Contact: https://www.qt.io/licensing/
-**
-** This file is part of the examples of the Qt Toolkit.
-**
-** $QT_BEGIN_LICENSE:BSD$
-** Commercial License Usage
-** Licensees holding valid commercial Qt licenses may use this file in
-** accordance with the commercial license agreement provided with the
-** Software or, alternatively, in accordance with the terms contained in
-** a written agreement between you and The Qt Company. For licensing terms
-** and conditions see https://www.qt.io/terms-conditions. For further
-** information use the contact form at https://www.qt.io/contact-us.
-**
-** BSD License Usage
-** Alternatively, you may use this file under the terms of the BSD license
-** as follows:
-**
-** "Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions are
-** met:
-**   * Redistributions of source code must retain the above copyright
-**     notice, this list of conditions and the following disclaimer.
-**   * Redistributions in binary form must reproduce the above copyright
-**     notice, this list of conditions and the following disclaimer in
-**     the documentation and/or other materials provided with the
-**     distribution.
-**   * Neither the name of The Qt Company Ltd nor the names of its
-**     contributors may be used to endorse or promote products derived
-**     from this software without specific prior written permission.
-**
-**
-** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-** "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-** LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-** A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-** OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-** LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-** DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
-**
-** $QT_END_LICENSE$
-**
-****************************************************************************/
-
 #include "audiorecorder.h"
 #include "audiolevel.h"
 
@@ -102,7 +52,7 @@ AudioRecorder::AudioRecorder()
     ui->sampleRateBox->addItem(tr("Default"), QVariant(0));
     for (int sampleRate: m_audioRecorder->supportedAudioSampleRates()) {
         ui->sampleRateBox->addItem(QString::number(sampleRate), QVariant(
-                sampleRate));
+                                       sampleRate));
     }
 
     //bitrates:
@@ -112,11 +62,32 @@ AudioRecorder::AudioRecorder()
     ui->bitrateBox->addItem(QStringLiteral("96000"), QVariant(96000));
     ui->bitrateBox->addItem(QStringLiteral("128000"), QVariant(128000));
 
+    //groupCB:
+    ui->groupCB->addItem(QStringLiteral("Dr.Kiani - Computer Graphics")    , QVariant(0));
+    ui->groupCB->addItem(QStringLiteral("Dr.Kiani - IT Projects Managment"), QVariant(1));
+    ui->groupCB->addItem(QStringLiteral("Dr.Rastgoo - MATLAB Lab")         , QVariant(2));
+
+    //rangeCB:
+    ui->rangeCB->addItem(QStringLiteral("0 - 99")   , QVariant(0));
+    ui->rangeCB->addItem(QStringLiteral("100 - 199"), QVariant(1));
+    ui->rangeCB->addItem(QStringLiteral("200 - 299"), QVariant(2));
+    ui->rangeCB->addItem(QStringLiteral("300 - 399"), QVariant(3));
+
+    //countSPB:
+    ui->curCntSPB->setRange(1, 10);
+
     connect(m_audioRecorder, &QAudioRecorder::durationChanged, this, &AudioRecorder::updateProgress);
     connect(m_audioRecorder, &QAudioRecorder::statusChanged, this, &AudioRecorder::updateStatus);
     connect(m_audioRecorder, &QAudioRecorder::stateChanged, this, &AudioRecorder::onStateChanged);
     connect(m_audioRecorder, QOverload<QMediaRecorder::Error>::of(&QAudioRecorder::error), this,
             &AudioRecorder::displayErrorMessage);
+    connect(ui->rangeCB, SIGNAL(currentIndexChanged(int)), this, SLOT(onRangeChange(int)));
+
+}
+
+bool AudioRecorder::isFormComplete()
+{
+    return ui->idSPB->value() != 0 && ui->nameLE->text() != "";
 }
 
 void AudioRecorder::updateProgress(qint64 duration)
@@ -182,6 +153,10 @@ static QVariant boxValue(const QComboBox *box)
 
 void AudioRecorder::toggleRecord()
 {
+    if(!isFormComplete()) {
+        ui->statusbar->showMessage("Please complete the form first!!");
+        return;
+    }
     if (m_audioRecorder->state() == QMediaRecorder::StoppedState) {
         m_audioRecorder->setAudioInput(boxValue(ui->audioDeviceBox).toString());
 
@@ -197,6 +172,19 @@ void AudioRecorder::toggleRecord()
     }
     else {
         m_audioRecorder->stop();
+        int curCTN = ui->curCntSPB->value();
+        int curNum = ui->curNumSPB->value();
+        curCTN++;
+        if(curCTN > 10) {
+            curCTN = 1;
+            curNum++;
+            if(curNum > ui->curNumSPB->maximum()) {
+                QMessageBox::information(this, "Success", "You have finished this range successfuly");
+                return;
+            }
+        }
+        ui->curCntSPB->setValue(curCTN);
+        ui->curNumSPB->setValue(curNum);
     }
 }
 
@@ -221,11 +209,12 @@ void AudioRecorder::setOutputLocation()
 #else
     QString fileName = QFileDialog::getExistingDirectory();
 #endif
-    int level    = ui->levelSPB->value();
+    int curNumber    = ui->curNumSPB->value();
+    int curCount     = ui->curCntSPB->value();
     int id       = ui->idSPB->value();
     QString name = ui->nameLE->text();
-    const QString m_dir = fileName + '\\' + name + "'s Semnan Recordings" + '\\' + QString::number(level / 10) + '\\';
-    QString saveFile = QDir().fromNativeSeparators(m_dir + QString::number(id)+ ' ' + QString::number(level % 10));
+    const QString m_dir = fileName + '\\' + name + "'s Semnan Recordings" + '\\' + QString::number(curNumber) + '\\';
+    QString saveFile = QDir().fromNativeSeparators(m_dir + QString::number(id)+ '-' + QString::number(curCount));
     QDir dir(saveFile);
     if(!dir.exists()) {
         if(!dir.mkpath(saveFile)) {
@@ -236,11 +225,39 @@ void AudioRecorder::setOutputLocation()
     qDebug() << saveFile;
     m_audioRecorder->setOutputLocation(QUrl::fromLocalFile(saveFile));
     m_outputLocationSet = true;
+
 }
 
 void AudioRecorder::displayErrorMessage()
 {
     ui->statusbar->showMessage(m_audioRecorder->errorString());
+}
+
+void AudioRecorder::onRangeChange(int state)
+{
+    switch (state) {
+    case 0:
+        ui->curNumSPB->setRange(0, 99);
+        ui->curNumSPB->setValue(0);
+        break;
+    case 1:
+        ui->curNumSPB->setRange(100, 199);
+        ui->curNumSPB->setValue(100);
+        break;
+    case 2:
+        ui->curNumSPB->setRange(200, 299);
+        ui->curNumSPB->setValue(200);
+        break;
+    case 3:
+        ui->curNumSPB->setRange(300, 399);
+        ui->curNumSPB->setValue(300);
+        break;
+    default:
+        ui->curNumSPB->setRange(0, 99);
+        ui->curNumSPB->setValue(0);
+        break;
+    }
+
 }
 
 void AudioRecorder::clearAudioLevels()

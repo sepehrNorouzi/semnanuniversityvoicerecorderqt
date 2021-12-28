@@ -70,6 +70,7 @@ class AudioRecorder : public QMainWindow
 
 public:
     AudioRecorder();
+    bool isFormComplete();
 
 public slots:
     void processBuffer(const QAudioBuffer&);
@@ -83,6 +84,7 @@ private slots:
     void onStateChanged(QMediaRecorder::State);
     void updateProgress(qint64 pos);
     void displayErrorMessage();
+    void onRangeChange(int state);
 
 private:
     void clearAudioLevels();
