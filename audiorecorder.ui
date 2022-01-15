@@ -2,89 +2,121 @@
 <ui version="4.0">
  <class>AudioRecorder</class>
  <widget class="QMainWindow" name="AudioRecorder">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>340</width>
-    <height>509</height>
+    <width>601</width>
+    <height>377</height>
    </rect>
   </property>
-  <property name="windowTitle">
-   <string>MainWindow</string>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"> QPushButton {
+         border: 2px solid #8f8f91;
+         border-radius: 10px;
+         background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                           stop: 0 #f6f7fa, stop: 1 #dadbde);
+         min-width: 80px;
+		 min-height: 30px;
+     }
+
+     QPushButton:pressed {
+         background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                           stop: 0 #dadbde, stop: 1 #f6f7fa);
+     }
+
+     QPushButton:flat {
+         border: none; /* no border for a flat push button */
+     }
+
+     QPushButton:default {
+         border-color: navy; /* make the default button prominent */
+     }
+
+
+QLineEdit {
+    border: 2px solid gray;
+    border-radius: 10px;
+    padding: 0 8px;
+    selection-background-color: darkgray;
+}
+
+/******************************/
+
+  QScrollBar:horizontal {
+         border: 2px solid grey;
+         background: #32CC99;
+         height: 15px;
+         margin: 0px 20px 0 20px;
+     }
+     QScrollBar::handle:horizontal {
+         background: white;
+         min-width: 20px;
+     }
+     QScrollBar::add-line:horizontal {
+         border: 2px solid grey;
+         background: #32CC99;
+         width: 20px;
+         subcontrol-position: right;
+         subcontrol-origin: margin;
+     }
+
+     QScrollBar::sub-line:horizontal {
+         border: 2px solid grey;
+         background: #32CC99;
+         width: 20px;
+         subcontrol-position: left;
+         subcontrol-origin: margin;
+     }
+</string>
+  </property>
+  <property name="class" stdset="0">
+   <string>mainWin</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="styleSheet">
+    <string notr="true">.sss {
+	background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0.972, stop:0 rgba(170, 255, 255, 255), stop:1 rgba(206, 206, 206, 255))
+}</string>
+   </property>
+   <property name="class" stdset="0">
+    <string>sss</string>
+   </property>
    <layout class="QGridLayout" name="gridLayout_3">
+    <item row="1" column="2">
+     <widget class="QPushButton" name="pauseButton">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>Pause</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QPushButton" name="recordButton">
+      <property name="text">
+       <string>Record</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1" colspan="2">
+     <layout class="QVBoxLayout" name="levelsLayout"/>
+    </item>
     <item row="0" column="0" colspan="3">
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Audio Codec:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QComboBox" name="audioCodecBox"/>
-      </item>
-      <item row="4" column="1">
-       <widget class="QComboBox" name="groupCB"/>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>Sample rate:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="9" column="1">
-       <widget class="QLineEdit" name="nameLE"/>
-      </item>
-      <item row="8" column="0">
-       <widget class="QLabel" name="label_6">
-        <property name="text">
-         <string>Given Id:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="label_8">
-        <property name="text">
-         <string>Study Group: </string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>File Container:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="8" column="1">
-       <widget class="QSpinBox" name="idSPB">
-        <property name="maximum">
-         <number>1000</number>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="0">
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>Current Number: </string>
-        </property>
-       </widget>
-      </item>
-      <item row="9" column="0">
-       <widget class="QLabel" name="label_7">
-        <property name="text">
-         <string>Name:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="1">
-       <widget class="QComboBox" name="rangeCB"/>
-      </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
@@ -92,97 +124,89 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QComboBox" name="audioDeviceBox"/>
+      <item row="6" column="0">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>Name:</string>
+        </property>
+       </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QComboBox" name="containerBox"/>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Current Number: </string>
+        </property>
+       </widget>
       </item>
-      <item row="3" column="1">
-       <widget class="QComboBox" name="sampleRateBox"/>
-      </item>
-      <item row="5" column="0">
+      <item row="2" column="0">
        <widget class="QLabel" name="label_9">
         <property name="text">
          <string>Range:</string>
         </property>
        </widget>
       </item>
-      <item row="6" column="1">
-       <widget class="QSpinBox" name="curNumSPB"/>
-      </item>
-      <item row="7" column="0">
+      <item row="4" column="0">
        <widget class="QLabel" name="label_10">
         <property name="text">
          <string>Current Count: </string>
         </property>
        </widget>
       </item>
+      <item row="6" column="1">
+       <widget class="QLineEdit" name="nameLE"/>
+      </item>
       <item row="7" column="1">
+       <widget class="QLineEdit" name="studentIdLE"/>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="audioDeviceBox"/>
+      </item>
+      <item row="4" column="1">
        <widget class="QSpinBox" name="curCntSPB"/>
+      </item>
+      <item row="5" column="1">
+       <widget class="QSpinBox" name="idSPB">
+        <property name="maximum">
+         <number>1000</number>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QComboBox" name="rangeCB"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>Study Group: </string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0">
+       <widget class="QLabel" name="label_11">
+        <property name="text">
+         <string>Student Id:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QSpinBox" name="curNumSPB"/>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>Given Id:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="groupCB"/>
       </item>
      </layout>
     </item>
-    <item row="1" column="0" colspan="3">
-     <widget class="QGroupBox" name="groupBox">
-      <property name="title">
-       <string>Encoding Mode:</string>
-      </property>
-      <layout class="QGridLayout" name="gridLayout">
-       <item row="1" column="0">
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="1" column="1">
-        <widget class="QComboBox" name="bitrateBox">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0" colspan="2">
-        <widget class="QRadioButton" name="constantBitrateRadioButton">
-         <property name="text">
-          <string>Constant Bitrate:</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item row="2" column="0">
+    <item row="1" column="0">
      <widget class="QPushButton" name="outputButton">
       <property name="text">
        <string>Output...</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="1">
-     <widget class="QPushButton" name="recordButton">
-      <property name="text">
-       <string>Record</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="2">
-     <widget class="QPushButton" name="pauseButton">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="text">
-       <string>Pause</string>
       </property>
      </widget>
     </item>
@@ -199,31 +223,41 @@
       </property>
      </widget>
     </item>
-    <item row="3" column="1" colspan="2">
-     <layout class="QVBoxLayout" name="levelsLayout"/>
+    <item row="2" column="1">
+     <spacer name="verticalSpacer">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeType">
+       <enum>QSizePolicy::Expanding</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>40</height>
+       </size>
+      </property>
+     </spacer>
     </item>
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <tabstops>
+  <tabstop>audioDeviceBox</tabstop>
+  <tabstop>groupCB</tabstop>
+  <tabstop>rangeCB</tabstop>
+  <tabstop>curNumSPB</tabstop>
+  <tabstop>curCntSPB</tabstop>
+  <tabstop>idSPB</tabstop>
+  <tabstop>nameLE</tabstop>
+  <tabstop>studentIdLE</tabstop>
+  <tabstop>outputButton</tabstop>
+  <tabstop>recordButton</tabstop>
+  <tabstop>pauseButton</tabstop>
+ </tabstops>
  <resources/>
  <connections>
-  <connection>
-   <sender>constantBitrateRadioButton</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>bitrateBox</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>198</x>
-     <y>192</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>262</x>
-     <y>223</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>outputButton</sender>
    <signal>clicked()</signal>

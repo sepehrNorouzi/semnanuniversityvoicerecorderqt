@@ -18,12 +18,15 @@ static QVector<qreal> getBufferLevels(const QAudioBuffer &buffer);
 template <class T>
 static QVector<qreal> getBufferLevels(const T *buffer, int frames, int channels);
 
+QString baseDIR = "";
+
+
 
 AudioRecorder::AudioRecorder()
     : ui(new Ui::AudioRecorder)
 {
     ui->setupUi(this);
-
+    setFixedSize(QSize(600,400));
     m_audioRecorder = new QAudioRecorder(this);
     m_probe = new QAudioProbe(this);
     connect(m_probe, &QAudioProbe::audioBufferProbed,
@@ -36,42 +39,16 @@ AudioRecorder::AudioRecorder()
         ui->audioDeviceBox->addItem(device, QVariant(device));
     }
 
-    //audio codecs
-    ui->audioCodecBox->addItem(tr("Default"), QVariant(QString()));
-    for (auto &codecName: m_audioRecorder->supportedAudioCodecs()) {
-        ui->audioCodecBox->addItem(codecName, QVariant(codecName));
-    }
-
-    //containers
-    ui->containerBox->addItem(tr("Default"), QVariant(QString()));
-    for (auto &containerName: m_audioRecorder->supportedContainers()) {
-        ui->containerBox->addItem(containerName, QVariant(containerName));
-    }
-
-    //sample rate
-    ui->sampleRateBox->addItem(tr("Default"), QVariant(0));
-    for (int sampleRate: m_audioRecorder->supportedAudioSampleRates()) {
-        ui->sampleRateBox->addItem(QString::number(sampleRate), QVariant(
-                                       sampleRate));
-    }
-
-    //bitrates:
-    ui->bitrateBox->addItem(tr("Default"), QVariant(0));
-    ui->bitrateBox->addItem(QStringLiteral("32000"), QVariant(32000));
-    ui->bitrateBox->addItem(QStringLiteral("64000"), QVariant(64000));
-    ui->bitrateBox->addItem(QStringLiteral("96000"), QVariant(96000));
-    ui->bitrateBox->addItem(QStringLiteral("128000"), QVariant(128000));
-
     //groupCB:
     ui->groupCB->addItem(QStringLiteral("Dr.Kiani - Computer Graphics")    , QVariant(0));
     ui->groupCB->addItem(QStringLiteral("Dr.Kiani - IT Projects Managment"), QVariant(1));
     ui->groupCB->addItem(QStringLiteral("Dr.Rastgoo - MATLAB Lab")         , QVariant(2));
 
     //rangeCB:
-    ui->rangeCB->addItem(QStringLiteral("0 - 99")   , QVariant(0));
-    ui->rangeCB->addItem(QStringLiteral("100 - 199"), QVariant(1));
-    ui->rangeCB->addItem(QStringLiteral("200 - 299"), QVariant(2));
-    ui->rangeCB->addItem(QStringLiteral("300 - 399"), QVariant(3));
+    ui->rangeCB->addItem(QStringLiteral("0 - 199")   , QVariant(0));
+    ui->rangeCB->addItem(QStringLiteral("200 - 399"), QVariant(1));
+    ui->rangeCB->addItem(QStringLiteral("400 - 599"), QVariant(2));
+    ui->rangeCB->addItem(QStringLiteral("600 - 799"), QVariant(3));
 
     //countSPB:
     ui->curCntSPB->setRange(1, 10);
@@ -92,7 +69,7 @@ bool AudioRecorder::isFormComplete()
 
 void AudioRecorder::updateProgress(qint64 duration)
 {
-    if (m_audioRecorder->error() != QMediaRecorder::NoError || duration < 2000)
+    if (m_audioRecorder->error() != QMediaRecorder::NoError || duration < 100)
         return;
 
     ui->statusbar->showMessage(tr("Recorded %1 sec").arg(duration / 1000));
@@ -161,30 +138,38 @@ void AudioRecorder::toggleRecord()
         m_audioRecorder->setAudioInput(boxValue(ui->audioDeviceBox).toString());
 
         QAudioEncoderSettings settings;
-        settings.setCodec(boxValue(ui->audioCodecBox).toString());
-        settings.setSampleRate(boxValue(ui->sampleRateBox).toInt());
-        settings.setBitRate(boxValue(ui->bitrateBox).toInt());
+        settings.setCodec("audio/pcm");
+        settings.setSampleRate(48000);
+        settings.setBitRate(32000);
 
-        QString container = boxValue(ui->containerBox).toString();
+        QString container = "audio/x-wav";
 
         m_audioRecorder->setEncodingSettings(settings, QVideoEncoderSettings(), container);
+        setOutputLocation();
         m_audioRecorder->record();
+
     }
     else {
-        m_audioRecorder->stop();
-        int curCTN = ui->curCntSPB->value();
-        int curNum = ui->curNumSPB->value();
-        curCTN++;
-        if(curCTN > 10) {
-            curCTN = 1;
-            curNum++;
-            if(curNum > ui->curNumSPB->maximum()) {
-                QMessageBox::information(this, "Success", "You have finished this range successfuly");
-                return;
+        if(baseDIR != "") {
+            m_audioRecorder->stop();
+            qDebug() << "Here " << ui->curCntSPB->value() << " " << ui->curNumSPB->value();
+            int curCTN = ui->curCntSPB->value();
+            int curNum = ui->curNumSPB->value();
+            curCTN++;
+            if(curCTN > 10) {
+                curCTN = 1;
+                curNum++;
+                if(curNum > ui->curNumSPB->maximum()) {
+                    QMessageBox::information(this, "Success", "You have finished this range successfuly");
+                    return;
+                }
             }
+            ui->curCntSPB->setValue(curCTN);
+            ui->curNumSPB->setValue(curNum);
         }
-        ui->curCntSPB->setValue(curCTN);
-        ui->curNumSPB->setValue(curNum);
+        else {
+            setOutputLocation();
+        }
     }
 }
 
@@ -198,23 +183,26 @@ void AudioRecorder::togglePause()
 
 void AudioRecorder::setOutputLocation()
 {
+    if(baseDIR == "") {
 #ifdef Q_OS_WINRT
-    // UWP does not allow to store outside the sandbox
-    const QString cacheDir = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
-    if (!QDir().mkpath(cacheDir)) {
-        qWarning() << "Failed to create cache directory";
-        return;
-    }
-    QString fileName = cacheDir + QLatin1String("/output.wav");
+        // UWP does not allow to store outside the sandbox
+        const QString cacheDir = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
+        if (!QDir().mkpath(cacheDir)) {
+            qWarning() << "Failed to create cache directory";
+            return;
+        }
+        QString fileName = cacheDir + QLatin1String("/output.wav");
 #else
-    QString fileName = QFileDialog::getExistingDirectory();
+        baseDIR = QFileDialog::getExistingDirectory();
 #endif
+    }
     int curNumber    = ui->curNumSPB->value();
     int curCount     = ui->curCntSPB->value();
     int id       = ui->idSPB->value();
     QString name = ui->nameLE->text();
-    const QString m_dir = fileName + '\\' + name + "'s Semnan Recordings" + '\\' + QString::number(curNumber) + '\\';
-    QString saveFile = QDir().fromNativeSeparators(m_dir + QString::number(id)+ '-' + QString::number(curCount));
+    const QString m_dir = baseDIR + '\\' + name + "'s Semnan Recordings" + '\\' + QString::number(curNumber) + '\\';
+    QString saveFile = QDir().fromNativeSeparators(m_dir);
+    qDebug() << saveFile;
     QDir dir(saveFile);
     if(!dir.exists()) {
         if(!dir.mkpath(saveFile)) {
@@ -222,8 +210,9 @@ void AudioRecorder::setOutputLocation()
             exit(0);
         };
     }
-    qDebug() << saveFile;
-    m_audioRecorder->setOutputLocation(QUrl::fromLocalFile(saveFile));
+    qDebug() << saveFile + QString::number(id)+ '_' + QString::number(curNumber) + "_" + QString::number(curCount) + ".wav";
+    m_audioRecorder->setOutputLocation(QUrl::fromLocalFile(saveFile + QString::number(id)+ '_' + QString::number(curNumber) + "_" + QString::number(curCount) + ".wav"));
+    m_audioRecorder->setObjectName(saveFile);
     m_outputLocationSet = true;
 
 }
@@ -237,23 +226,23 @@ void AudioRecorder::onRangeChange(int state)
 {
     switch (state) {
     case 0:
-        ui->curNumSPB->setRange(0, 99);
+        ui->curNumSPB->setRange(0, 199);
         ui->curNumSPB->setValue(0);
         break;
     case 1:
-        ui->curNumSPB->setRange(100, 199);
-        ui->curNumSPB->setValue(100);
-        break;
-    case 2:
-        ui->curNumSPB->setRange(200, 299);
+        ui->curNumSPB->setRange(200, 399);
         ui->curNumSPB->setValue(200);
         break;
+    case 2:
+        ui->curNumSPB->setRange(400, 599);
+        ui->curNumSPB->setValue(400);
+        break;
     case 3:
-        ui->curNumSPB->setRange(300, 399);
-        ui->curNumSPB->setValue(300);
+        ui->curNumSPB->setRange(600, 799);
+        ui->curNumSPB->setValue(600);
         break;
     default:
-        ui->curNumSPB->setRange(0, 99);
+        ui->curNumSPB->setRange(0, 199);
         ui->curNumSPB->setValue(0);
         break;
     }
